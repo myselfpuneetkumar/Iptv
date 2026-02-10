@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Playlist Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+    }
+    .search {
+      max-width: 600px;
+      margin: 20px auto;
+      display: block;
+      padding: 10px;
+      width: 100%;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+    .channel {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+    .channel h3 {
+      margin: 0 0 8px 0;
+      color: #facc15;
+    }
+    .channel a {
+      color: #38bdf8;
+      word-break: break-all;
+      text-decoration: none;
+    }
+    .channel a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Live TV by <a href="https://youtube.com/@techwith-adii">Tech Adii</a> </h1>
+<hr>
+
+<input class="search" type="text" id="search" placeholder="Search channel name..." />
+
+<div id="playlist"></div>
+
+<script>
+fetch('./playlist.json')
+  .then(response => response.json())
+  .then(data => {
+    const container = document.getElementById('playlist');
+    const search = document.getElementById('search');
+
+    function render(list) {
+      container.innerHTML = '';
+      list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'channel';
+        div.innerHTML = `
+          <h3>${item.name || 'Untitled Channel'}</h3>
+          <a href="${item.url}" target="_blank">${item.url}</a>
+          <h5> ${item.info}</h5>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    render(data);
+
+    search.addEventListener('input', () => {
+      const value = search.value.toLowerCase();
+      const filtered = data.filter(ch =>
+        (ch.name || '').toLowerCase().includes(value)
+      );
+      render(filtered);
+    });
+  })
+  .catch(err => {
+    document.getElementById('playlist').innerText =
+      'Error loading playlist.json. Make sure both files are in the same folder.';
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>
